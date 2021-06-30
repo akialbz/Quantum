@@ -13,4 +13,7 @@ RUN set -ex \
     && pip3 install --upgrade --no-cache-dir pip \
     && pip3 install --no-cache-dir \
        kagami \
-       seaborn
+       seaborn \
+       python-igraph \
+       pyvis \
+       scikit-fuzzy 
