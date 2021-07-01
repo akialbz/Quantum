@@ -31,11 +31,8 @@ RUN set -ex \
        pandas \
        tables \
        scikit-learn \
-       imbalanced-learn \
        statsmodels \
        matplotlib \
-       plotly \
-       networkx \
        requests \
        pysocks \
        hypothesis \       
@@ -52,10 +49,10 @@ RUN set -ex \
 
 # set work dirs
 RUN set -ex \
-    && mkdir -p /home/docker/ \
-    && mkdir -p /home/shared_library
-ENV PYTHONPATH /home/shared_library
+    && mkdir -p /home/docker/project/ \
+    && mkdir -p /home/docker/library/
+ENV PYTHONPATH /home/docker/library/
 
 # set entry
-WORKDIR /home/docker/
+WORKDIR /home/docker/project/
 CMD ["python3"]

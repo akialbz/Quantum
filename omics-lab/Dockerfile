@@ -1,6 +1,6 @@
 #
 # Modified from official Python and R Dockerfiles for machine learning
-# JupyterLab, RStudio, and AI/ML packages included
+# JupyterLab, RStudio, and Commonly used Omics analysis packages included
 #
 # author(s): Albert (aki) Zhou
 # origin: 11-05-2018
@@ -38,9 +38,6 @@ RUN set -ex \
     && pip3 install --no-cache-dir \
        kagami \
        seaborn \
-       cython \
-       pydotplus \ 
-       pyyaml \
        bokeh \
        plotly \
        imbalanced-learn \
@@ -48,15 +45,7 @@ RUN set -ex \
        python-igraph \
        networkx \
        pyvis \
-       fastcluster \
-       eli5 \
-       shap \
-       xgboost \
-       keras \
-       Theano \
-       lime \
-    && pip3 install tensorflow==2.5.0rc0 \
-    && pip3 install --no-cache-dir torch==1.8.1+cpu torchvision==0.9.1+cpu torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+       fastcluster
 
 # Install R packages
 RUN R -e 'install.packages(c( \
@@ -72,6 +61,15 @@ RUN R -e 'install.packages(c( \
               "gplots", \
               "plotly" \
           ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
+
+RUN R -e 'install.packages("BiocManager"); \
+          BiocManager::install(c( \
+              "WGCNA", \
+              "DESeq2", \
+              "limma", \
+              "sva", \
+              "mixOmics" \
+          ), suppressUpdates = F, ask = F, clean = T)'
 
 # clean
 RUN set -ex \

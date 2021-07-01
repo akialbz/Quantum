@@ -48,7 +48,7 @@ RUN set -ex \
 ENV NODE_OPTIONS="--max-old-space-size=4096" 
 
 RUN set -ex \
-    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y --no-install-recommends nodejs 
 
 # jupyterlab & kernels
@@ -63,20 +63,21 @@ RUN set -ex \
 # extensions
 RUN set -ex \
     && pip3 install --no-cache-dir \
-       aquirdturtle_collapsible_headings \
-       jupyter_bokeh \
-       ipympl \
-       jupyterlab-drawio \
        ipywidgets \
+       ipympl \
+       jupyter_bokeh \
        kaleido \
        chart-studio \
+       jupyter-dash \
        lckr-jupyterlab-variableinspector \
        jupyter-resource-usage \
+       jupyterlab-drawio \
+       aquirdturtle_collapsible_headings \
     && jupyter labextension install \
        @jupyter-widgets/jupyterlab-manager \
        jupyter-matplotlib \
        jupyterlab-plotly \
-       plotlywidget \
+       jupyterlab-chart-editor \
     && jupyter lab build --name='QuantumLab'\
     && jupyter lab clean \
     && jlpm cache clean \
