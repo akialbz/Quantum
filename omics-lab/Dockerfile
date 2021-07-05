@@ -12,20 +12,20 @@ FROM quantum:lab
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \ 
-       libblas-dev \
-       liblapack-dev \
        libcurl4 \
        libcurl4-openssl-dev \
        libxml2 \
        libxml2-dev \
+       zlib1g \
+       zlib1g-dev \
+       libblas-dev \
+       liblapack-dev \
        libssl1.1 \                
        libssl-dev \
        libpng16-16 \
        libpng-dev \
        libjpeg62-turbo \
        libjpeg62-turbo-dev \
-       zlib1g \
-       zlib1g-dev \
        git \
        pkg-config \
        build-essential \
@@ -51,12 +51,7 @@ RUN set -ex \
 RUN R -e 'install.packages(c( \
               "devtools", \
               "dynamicTreeCut", \
-              "randomForest", \
-              "tidyverse", \
-              "dplyr", \
-              "caret", \
               "RGCCA", \
-              "iml", \
               "igraph", \
               "gplots", \
               "plotly" \
@@ -76,11 +71,11 @@ RUN set -ex \
     && apt-get purge -y \
        libcurl4-openssl-dev \
        libxml2-dev \
-       libssl-dev \
        zlib1g-dev \
-       libpng-dev \
        libblas-dev \
        liblapack-dev \
+       libssl-dev \
+       libpng-dev \
        libjpeg62-turbo-dev \
        build-essential \
        gfortran \

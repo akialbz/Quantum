@@ -13,7 +13,12 @@ RUN set -ex \
     && pip3 install --upgrade --no-cache-dir pip \
     && pip3 install --no-cache-dir \
        kagami \
-       seaborn \
        python-igraph \
        pyvis \
        scikit-fuzzy 
+
+# Install R packages
+RUN R -e 'install.packages(c( \
+              "RGCCA", \
+              "igraph", \
+          ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
