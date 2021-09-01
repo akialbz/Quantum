@@ -5,7 +5,7 @@
 # origin: 11-05-2018
 #
 
-FROM python:3.9-slim-buster
+FROM python:3.9-slim-bullseye
 
 # Add new user
 RUN set -ex \
@@ -19,7 +19,7 @@ RUN set -ex \
 # Install dependencies
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y --no-install-recommends \ 
+    && apt-get install -y --no-install-recommends \
        libhdf5-dev
 
 # Install Python packages
@@ -35,7 +35,7 @@ RUN set -ex \
        matplotlib \
        requests \
        pysocks \
-       hypothesis \       
+       hypothesis \
        pytest
 
 # clean

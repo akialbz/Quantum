@@ -20,5 +20,5 @@ RUN set -ex \
 # Install R packages
 RUN R -e 'install.packages(c( \
               "RGCCA", \
-              "igraph", \
+              "igraph" \
           ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'

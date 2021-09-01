@@ -27,15 +27,13 @@ RUN set -ex \
     && locale-gen en_US.utf8 \
     && /usr/sbin/update-locale LANG=en_US.UTF-8
 
-COPY buster-cran40_pub.key /tmp/
 RUN set -ex \
-    && apt-key add /tmp/buster-cran40_pub.key \
-    && echo "deb http://cloud.r-project.org/bin/linux/debian buster-cran40/" >> /etc/apt/sources.list \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-key 'E19F5F87128899B192B1A2C2AD5F960A256A04AF' \
+    && echo "deb http://cloud.r-project.org/bin/linux/debian bullseye-cran40/" >> /etc/apt/sources.list \
     && apt-get update \
-    && apt-get install -t buster-cran40 -y --no-install-recommends \
+    && apt-get install -t bullseye-cran40 -y --no-install-recommends \
        r-base \
-       r-base-dev \
-    && rm /tmp/buster-cran40_pub.key 
+       r-base-dev
 
 # Install rpy2
 RUN pip3 install --no-cache-dir rpy2

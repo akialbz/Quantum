@@ -23,17 +23,21 @@ RUN set -ex \
        build-essential
 
 RUN set -ex \
-    && curl -sL https://github.com/jgm/pandoc/releases/download/2.13/pandoc-2.13-linux-amd64.tar.gz | tar zxf - \
-    && mv pandoc-2.13/bin/* /usr/local/bin/ \
-    && mv pandoc-2.13/share/man/man1/* /usr/local/share/man/man1/ \
-    && rm -rf pandoc-2.13
+    && curl -sL https://github.com/jgm/pandoc/releases/download/2.14.2/pandoc-2.14.2-linux-amd64.tar.gz | tar zxf - \
+    && mv pandoc-2.14.2/bin/* /usr/local/bin/ \
+    && mv pandoc-2.14.2/share/man/man1/* /usr/local/share/man/man1/ \
+    && rm -rf pandoc-2.14.2
+
+# Install venv
+RUN set -ex \
+    && pip3 install virtualenv
 
 # Install RStudio Server
 RUN set -ex \
     && apt-get install -y --no-install-recommends gdebi-core \
-    && wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.4.1106-amd64.deb \
-    && gdebi -n rstudio-server-1.4.1106-amd64.deb \
-    && rm rstudio-server-1.4.1106-amd64.deb \
+    && wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.4.1717-amd64.deb \
+    && gdebi -n rstudio-server-1.4.1717-amd64.deb \
+    && rm rstudio-server-1.4.1717-amd64.deb \
     && echo 'lock-type=advisory' >> /etc/rstudio/file-locks \
     && echo 'rsession-which-r=/usr/bin/R \
            \nauth-none=1' >> /etc/rstudio/rserver.conf \
@@ -56,7 +60,8 @@ RUN set -ex \
     && pip3 install jupyterlab \
     && pip3 install --no-cache-dir \
        # newer version not yet compatible
-       jedi==0.17.2 \
+    #    jedi==0.17.2 \
+       jedi \
        ipykernel \
     && R -e 'install.packages("IRkernel", repos="https://cloud.r-project.org/"); IRkernel::installspec()'
 
@@ -102,3 +107,4 @@ EXPOSE 8787 8888
 ENV USER="docker"
 COPY entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["entrypoint.sh"]
+

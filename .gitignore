@@ -2,6 +2,7 @@
 .idea/
 .vscode/
 .ipynb_checkpoints/
+kshatriya/
 
 # file types
 *.pyc

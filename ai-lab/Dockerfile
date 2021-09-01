@@ -55,8 +55,8 @@ RUN set -ex \
        keras \
        Theano \
        lime \
-    && pip3 install tensorflow==2.5.0rc0 \
-    && pip3 install --no-cache-dir torch==1.8.1+cpu torchvision==0.9.1+cpu torchaudio==0.8.1 -f https://download.pytorch.org/whl/torch_stable.html
+       tensorflow \
+    && pip3 install --no-cache-dir torch==1.9.0+cpu torchvision==0.10.0+cpu torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 # Install R packages
 RUN R -e 'install.packages(c( \
