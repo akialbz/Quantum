@@ -1,6 +1,6 @@
 #
 # Modified from official Python and R Dockerfiles
-# JupyterLab and RStudio included
+# JupyterLab included
 #
 # author(s): Albert (aki) Zhou
 # origin: 11-05-2018
@@ -14,38 +14,12 @@ RUN set -ex \
     && apt-get install -y --no-install-recommends \ 
        libzmq5 \
        libzmq5-dev \
-       libunwind8 \
-       libunwind-dev \
-       libfreetype6 \
-       libfreetype6-dev \
        curl \
-       wget \
        build-essential
-
-RUN set -ex \
-    && curl -sL https://github.com/jgm/pandoc/releases/download/2.14.2/pandoc-2.14.2-linux-amd64.tar.gz | tar zxf - \
-    && mv pandoc-2.14.2/bin/* /usr/local/bin/ \
-    && mv pandoc-2.14.2/share/man/man1/* /usr/local/share/man/man1/ \
-    && rm -rf pandoc-2.14.2
 
 # Install venv
 RUN set -ex \
     && pip3 install virtualenv
-
-# Install RStudio Server
-RUN set -ex \
-    && apt-get install -y --no-install-recommends gdebi-core \
-    && wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.4.1717-amd64.deb \
-    && gdebi -n rstudio-server-1.4.1717-amd64.deb \
-    && rm rstudio-server-1.4.1717-amd64.deb \
-    && echo 'lock-type=advisory' >> /etc/rstudio/file-locks \
-    && echo 'rsession-which-r=/usr/bin/R \
-           \nauth-none=1' >> /etc/rstudio/rserver.conf \
-    && mkdir -p /home/docker/.rstudio/monitored/user-settings \
-    && echo 'alwaysSaveHistory="0" \
-           \nloadRData="0" \
-           \nsaveAction="0"' > /home/docker/.rstudio/monitored/user-settings/user-settings \
-    && chown -R docker:docker /home/docker/.rstudio
 
 # Install JupyterLab
 # node.js
@@ -59,8 +33,6 @@ RUN set -ex \
 RUN set -ex \
     && pip3 install jupyterlab \
     && pip3 install --no-cache-dir \
-       # newer version not yet compatible
-    #    jedi==0.17.2 \
        jedi \
        ipykernel \
     && R -e 'install.packages("IRkernel", repos="https://cloud.r-project.org/"); IRkernel::installspec()'
@@ -92,10 +64,7 @@ RUN set -ex \
 RUN set -ex \
     && apt-get purge -y \
        libzmq5-dev \
-       libunwind-dev \
-       libfreetype6-dev \
        curl \
-       wget \
        build-essential \
     && apt-get --purge autoremove -y \
     && apt-get autoclean -y \
@@ -103,8 +72,7 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 # set entry
-EXPOSE 8787 8888
+EXPOSE 8888
 ENV USER="docker"
 COPY entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["entrypoint.sh"]
-

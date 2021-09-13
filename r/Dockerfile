@@ -1,51 +1,62 @@
 #
-# Modified from official Python and R Dockerfiles for machine learning
-# JupyterLab, RStudio, and Commonly used Omics analysis packages included
+# Modified from official R Dockerfiles
 #
 # author(s): Albert (aki) Zhou
 # origin: 11-05-2018
 #
 
-FROM quantum:lab
+FROM debian:bullseye-slim
+
+# Add new user
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends sudo \
+    && useradd -m -d /home/docker -U docker \
+    && echo "docker:passwd" | chpasswd \
+    && adduser docker sudo \
+    && addgroup docker staff
 
 # Install dependencies
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \ 
+       libblas3 \
+       libblas-dev \
+       liblapack3 \
+       liblapack-dev \
        libcurl4 \
        libcurl4-openssl-dev \
        libxml2 \
        libxml2-dev \
-       zlib1g \
-       zlib1g-dev \
-       libblas-dev \
-       liblapack-dev \
        libssl1.1 \                
        libssl-dev \
        libpng16-16 \
        libpng-dev \
        libjpeg62-turbo \
        libjpeg62-turbo-dev \
+       zlib1g \
+       zlib1g-dev \
        git \
-       pkg-config \
-       build-essential \
-       gfortran \
-    && ln -s /usr/lib/x86_64-linux-gnu/libgfortran.so.5 /usr/lib/x86_64-linux-gnu/libgfortran.so 
+       locales \
+       gnupg \
+       build-essential
 
-# Install additional Python packages
+# Install latest R
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+
 RUN set -ex \
-    && pip3 install --upgrade --no-cache-dir pip \
-    && pip3 install --no-cache-dir \
-       kagami \
-       seaborn \
-       bokeh \
-       plotly \
-       imbalanced-learn \
-       scikit-fuzzy \
-       python-igraph \
-       networkx \
-       pyvis \
-       fastcluster
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen en_US.utf8 \
+    && /usr/sbin/update-locale LANG=en_US.UTF-8
+
+RUN set -ex \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-key 'E19F5F87128899B192B1A2C2AD5F960A256A04AF' \
+    && echo "deb http://cloud.r-project.org/bin/linux/debian bullseye-cran40/" >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -t bullseye-cran40 -y --no-install-recommends \
+       r-base \
+       r-base-dev
 
 # Install R packages
 RUN R -e 'install.packages(c( \
@@ -53,6 +64,9 @@ RUN R -e 'install.packages(c( \
               "dynamicTreeCut", \
               "RGCCA", \
               "igraph", \
+              "tidyverse", \
+              "dplyr", \
+              "caret", \
               "gplots", \
               "plotly" \
           ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
@@ -69,17 +83,25 @@ RUN R -e 'install.packages("BiocManager"); \
 # clean
 RUN set -ex \
     && apt-get purge -y \
-       libcurl4-openssl-dev \
-       libxml2-dev \
-       zlib1g-dev \
        libblas-dev \
        liblapack-dev \
+       libcurl4-openssl-dev \
+       libxml2-dev \
        libssl-dev \
        libpng-dev \
        libjpeg62-turbo-dev \
+       zlib1g-dev \
+       r-base-dev \
        build-essential \
-       gfortran \
     && apt-get --purge autoremove -y \
     && apt-get autoclean -y \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
+        
+# set work dirs
+RUN set -ex \
+    && mkdir -p /home/docker/project/ 
+
+# set entry
+WORKDIR /home/docker/project/
+CMD ["R"]
