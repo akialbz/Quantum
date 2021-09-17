@@ -71,6 +71,13 @@ RUN set -ex \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 
+# config Jupyter
+COPY passwdcfg /usr/local/
+RUN set -ex \
+    && jupyter notebook --generate-config \
+    && cat /usr/local/passwdcfg >> /root/.jupyter/jupyter_server_config.json \
+    && rm /usr/local/passwdcfg
+
 # set entry
 EXPOSE 8888
 ENV USER="docker"

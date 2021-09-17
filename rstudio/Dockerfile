@@ -36,8 +36,7 @@ RUN set -ex \
     && gdebi -n rstudio-server-1.4.1717-amd64.deb \
     && rm rstudio-server-1.4.1717-amd64.deb \
     && echo 'lock-type=advisory' >> /etc/rstudio/file-locks \
-    && echo 'rsession-which-r=/usr/bin/R \
-           \nauth-none=1' >> /etc/rstudio/rserver.conf \
+    && echo 'rsession-which-r=/usr/bin/R' >> /etc/rstudio/rserver.conf \
     && mkdir -p /home/docker/.rstudio/monitored/user-settings \
     && echo 'alwaysSaveHistory="0" \
            \nloadRData="0" \

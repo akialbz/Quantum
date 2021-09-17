@@ -8,13 +8,15 @@
 FROM python:3.9-slim-bullseye
 
 # Add new user
+COPY passwd /usr/local/
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends sudo \
     && useradd -m -d /home/docker -U docker \
-    && echo "docker:passwd" | chpasswd \
+    && cat /usr/local/passwd | chpasswd \
     && adduser docker sudo \
-    && addgroup docker staff
+    && addgroup docker staff \
+    && rm /usr/local/passwd
 
 # Install Python packages
 RUN set -ex \

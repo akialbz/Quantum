@@ -8,13 +8,15 @@
 FROM debian:bullseye-slim
 
 # Add new user
+COPY passwd /usr/local/
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends sudo \
     && useradd -m -d /home/docker -U docker \
-    && echo "docker:passwd" | chpasswd \
+    && cat /usr/local/passwd | chpasswd \
     && adduser docker sudo \
-    && addgroup docker staff
+    && addgroup docker staff \
+    && rm /usr/local/passwd
 
 # Install dependencies
 RUN set -ex \
