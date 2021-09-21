@@ -46,7 +46,7 @@ RUN set -ex \
        kaleido \
        chart-studio \
        jupyter-dash \
-       lckr-jupyterlab-variableinspector \
+    #    lckr-jupyterlab-variableinspector \
        jupyter-resource-usage \
        jupyterlab-drawio \
        aquirdturtle_collapsible_headings \
