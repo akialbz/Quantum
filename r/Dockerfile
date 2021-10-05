@@ -7,17 +7,6 @@
 
 FROM debian:bullseye-slim
 
-# Add new user
-COPY passwd /usr/local/
-RUN set -ex \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends sudo \
-    && useradd -m -d /home/docker -U docker \
-    && cat /usr/local/passwd | chpasswd \
-    && adduser docker sudo \
-    && addgroup docker staff \
-    && rm /usr/local/passwd
-
 # Install dependencies
 RUN set -ex \
     && apt-get update \
@@ -36,12 +25,30 @@ RUN set -ex \
        libpng-dev \
        libjpeg62-turbo \
        libjpeg62-turbo-dev \
+       libzmq5 \
+       libzmq5-dev \
+       libunwind8 \
+       libunwind-dev \
+       libfreetype6 \
+       libfreetype6-dev \
        zlib1g \
        zlib1g-dev \
        git \
        locales \
        gnupg \
+       curl \
+       wget \
+       default-jre \
+       default-jdk \
        build-essential
+
+RUN set -ex \
+    && wget --no-check-certificate https://github.com/jgm/pandoc/releases/download/2.14.2/pandoc-2.14.2-linux-amd64.tar.gz \
+    && tar -zxf pandoc-2.14.2-linux-amd64.tar.gz \
+    && mv pandoc-2.14.2/bin/* /usr/local/bin/ \
+    && mkdir -p /usr/local/share/man/man1/ \
+    && mv pandoc-2.14.2/share/man/man1/* /usr/local/share/man/man1/ \
+    && rm -rf pandoc-2.14.2
 
 # Install latest R
 ENV LC_ALL en_US.UTF-8
@@ -61,30 +68,67 @@ RUN set -ex \
        r-base-dev
 
 # Install R packages
+RUN R CMD javareconf
 RUN R -e 'install.packages(c( \
-              "devtools", \
-              "dynamicTreeCut", \
-              "RGCCA", \
-              "igraph", \
-              "tidyverse", \
-              "dplyr", \
-              "caret", \
-              "gplots", \
-              "plotly" \
+            # utils
+            "devtools", \
+            "rJava", \
+            # data manipulation
+            "tidyverse", \
+            "dplyr", \
+            # matrix decomposition
+            "RGCCA", \
+            "umap", \
+            # graph
+            "igraph", \
+            "dynamicTreeCut", \
+            # machine learning 
+            "caret", \
+            "mlr", \
+            "kernlab", \
+            "randomForest", \
+            "rpart", \
+            "bartMachine", \
+            # ecology
+            "vegan", \
+            "ade4", \
+            # single cell
+            "Seurat", \
+            # visualisation
+            "factoextra", \
+            "pheatmap", \
+            "gplots", \
+            "plotly" \
           ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
 
 RUN R -e 'install.packages("BiocManager"); \
           BiocManager::install(c( \
-              "WGCNA", \
-              "DESeq2", \
-              "limma", \
-              "sva", \
-              "mixOmics" \
+            # RNA-Seq
+            "DESeq2", \
+            "GSEABase", \
+            "limma", \
+            "sva", \
+            # single cell
+            "scater", \
+            "harmony", \
+            # multiomics
+            "mixOmics", \
+            "omicade4", \
+            "MOFA2", \
+            "MOFAdata", \
+            # graph
+            "WGCNA" \
           ), suppressUpdates = F, ask = F, clean = T)'
+
+RUN R -e 'devtools::install_github("isglobal-brge/rexposome"); \
+          devtools::install_github("isglobal-brge/omicRexposome")'
 
 # clean
 RUN set -ex \
     && apt-get purge -y \
+       libzmq5-dev \
+       libunwind-dev \
+       libfreetype6-dev \
        libblas-dev \
        liblapack-dev \
        libcurl4-openssl-dev \
@@ -94,16 +138,18 @@ RUN set -ex \
        libjpeg62-turbo-dev \
        zlib1g-dev \
        r-base-dev \
+       curl \
+       wget \
        build-essential \
     && apt-get --purge autoremove -y \
     && apt-get autoclean -y \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
-        
+
 # set work dirs
 RUN set -ex \
-    && mkdir -p /home/docker/project/ 
+    && mkdir -p /home/docker/
+WORKDIR /home/docker/
 
 # set entry
-WORKDIR /home/docker/project/
-CMD ["R"]
+CMD R

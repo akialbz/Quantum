@@ -6,7 +6,7 @@
 # origin: 11-05-2018
 #
 
-FROM quantum:dev-r
+FROM akialbz/quantum:dev
 
 # Install dependencies
 RUN set -ex \
@@ -46,10 +46,8 @@ RUN set -ex \
        kaleido \
        chart-studio \
        jupyter-dash \
-    #    lckr-jupyterlab-variableinspector \
        jupyter-resource-usage \
        jupyterlab-drawio \
-       aquirdturtle_collapsible_headings \
     && jupyter labextension install \
        @jupyter-widgets/jupyterlab-manager \
        jupyter-matplotlib \
@@ -78,8 +76,12 @@ RUN set -ex \
     && cat /usr/local/passwdcfg >> /root/.jupyter/jupyter_server_config.json \
     && rm /usr/local/passwdcfg
 
+# set work dirs
+RUN set -ex \
+    && mkdir -p /home/share/python/dist-packages/
+ENV PYTHONPATH /home/share/python/dist-packages/
+
 # set entry
 EXPOSE 8888
-ENV USER="docker"
 COPY entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["entrypoint.sh"]

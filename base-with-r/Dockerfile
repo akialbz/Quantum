@@ -5,7 +5,7 @@
 # origin: 11-05-2018
 #
 
-FROM quantum:dev
+FROM akialbz/quantum:base
 
 # Install dependencies
 RUN set -ex \
@@ -48,4 +48,3 @@ RUN set -ex \
     && apt-get autoclean -y \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
-        

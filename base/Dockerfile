@@ -7,32 +7,47 @@
 
 FROM python:3.9-slim-bullseye
 
-# Add new user
-COPY passwd /usr/local/
+# Install dependencies
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y --no-install-recommends sudo \
-    && useradd -m -d /home/docker -U docker \
-    && cat /usr/local/passwd | chpasswd \
-    && adduser docker sudo \
-    && addgroup docker staff \
-    && rm /usr/local/passwd
+    && apt-get install -y --no-install-recommends \
+       libhdf5-dev \
+       libopenmpi-dev \
+       build-essential
 
 # Install Python packages
 RUN set -ex \
-    && pip3 install --upgrade --no-cache-dir pip \
+    && pip3 install --no-cache-dir --upgrade pip \
     && pip3 install --no-cache-dir \
+       hypothesis \
+       pytest \
+       mpi4py \
+       mpmath \
+       numexpr \
        numpy \
        scipy \
-       hypothesis \
-       pytest
+       pandas \
+       requests \
+       pysocks \
+       tables \
+       kagami
+
+# clean
+RUN set -ex \
+    && apt-get purge -y \
+       libhdf5-dev \
+       build-essential \
+    && apt-get --purge autoremove -y \
+    && apt-get autoclean -y \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && rm -rf /var/lib/apt/lists/*
 
 # set work dirs
 RUN set -ex \
-    && mkdir -p /home/docker/project/ \
-    && mkdir -p /home/docker/library/
-ENV PYTHONPATH /home/docker/library/
+    && mkdir -p /home/docker/
+WORKDIR /home/docker/
 
 # set entry
-WORKDIR /home/docker/project/
-CMD ["python3"]
+RUN set -ex \
+    && pip3 install --no-cache-dir ipython ipykernel
+CMD python -m ipykernel_launcher -f $DOCKERNEL_CONNECTION_FILE

@@ -1,11 +1,11 @@
 #
-# Modified from official Python Dockerfiles
+# Dedicated Lazypredict image
 #
 # author(s): Albert (aki) Zhou
 # origin: 13-09-2021
 #
 
-FROM quantum:base
+FROM akialbz/quantum:base
 
 # Install dependencies
 RUN set -ex \
@@ -16,10 +16,8 @@ RUN set -ex \
 
 # Install Python packages
 RUN set -ex \
-    && pip3 install --upgrade --no-cache-dir pip \
-    && pip3 install --no-cache-dir \
-       kagami \
-       lazypredict
+    && pip3 install --no-cache-dir --upgrade pip \
+    && pip3 install --no-cache-dir lazypredict
 
 # clean
 RUN set -ex \
