@@ -8,7 +8,7 @@
 
 FROM akialbz/quantum:r
 
-# Add new user
+# add new user
 COPY passwd /usr/local/
 RUN set -ex \
     && apt-get update \
@@ -19,7 +19,7 @@ RUN set -ex \
     && addgroup docker staff \
     && rm /usr/local/passwd
 
-# Install dependencies
+# install dependencies
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \ 
@@ -27,7 +27,7 @@ RUN set -ex \
        gdebi-core \
        build-essential
 
-# Install RStudio Server
+# install RStudio Server
 RUN set -ex \
     && wget --no-check-certificate https://download2.rstudio.org/server/bionic/amd64/rstudio-server-2021.09.0-351-amd64.deb \
     && gdebi -n rstudio-server-2021.09.0-351-amd64.deb \

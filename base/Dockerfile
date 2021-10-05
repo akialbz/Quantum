@@ -7,7 +7,7 @@
 
 FROM python:3.9-slim-bullseye
 
-# Install dependencies
+# install dependencies
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -15,7 +15,7 @@ RUN set -ex \
        libopenmpi-dev \
        build-essential
 
-# Install Python packages
+# install Python packages
 RUN set -ex \
     && pip3 install --no-cache-dir --upgrade pip \
     && pip3 install --no-cache-dir \

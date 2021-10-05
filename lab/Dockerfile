@@ -8,7 +8,7 @@
 
 FROM akialbz/quantum:dev
 
-# Install dependencies
+# install dependencies
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \ 
@@ -17,11 +17,12 @@ RUN set -ex \
        curl \
        build-essential
 
-# Install venv
+# install venv
 RUN set -ex \
-    && pip3 install virtualenv
+    && pip3 install --upgrade --no-cache-dir pip \
+    && pip3 install --no-cache-dir virtualenv
 
-# Install JupyterLab
+# install JupyterLab
 # node.js
 ENV NODE_OPTIONS="--max-old-space-size=4096" 
 
@@ -31,7 +32,7 @@ RUN set -ex \
 
 # jupyterlab & kernels
 RUN set -ex \
-    && pip3 install jupyterlab \
+    && pip3 install --no-cache-dir jupyterlab \
     && pip3 install --no-cache-dir \
        jedi \
        ipykernel \

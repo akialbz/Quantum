@@ -7,7 +7,7 @@
 
 FROM debian:bullseye-slim
 
-# Install dependencies
+# install dependencies
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \ 
@@ -50,7 +50,7 @@ RUN set -ex \
     && mv pandoc-2.14.2/share/man/man1/* /usr/local/share/man/man1/ \
     && rm -rf pandoc-2.14.2
 
-# Install latest R
+# install latest R
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 
@@ -67,7 +67,7 @@ RUN set -ex \
        r-base \
        r-base-dev
 
-# Install R packages
+# install R packages
 RUN R CMD javareconf
 RUN R -e 'install.packages(c( \
             # utils

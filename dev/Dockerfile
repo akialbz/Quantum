@@ -7,7 +7,7 @@
 
 FROM akialbz/quantum:base-with-r
 
-# Install Python packages
+# install Python packages
 RUN set -ex \
     && pip3 install --upgrade --no-cache-dir pip \
     && pip3 install --no-cache-dir \

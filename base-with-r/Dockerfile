@@ -7,7 +7,7 @@
 
 FROM akialbz/quantum:base
 
-# Install dependencies
+# install dependencies
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \ 
@@ -18,7 +18,7 @@ RUN set -ex \
        locales \
        gnupg
 
-# Install latest R
+# install latest R
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 
@@ -35,7 +35,7 @@ RUN set -ex \
        r-base \
        r-base-dev
 
-# Install rpy2
+# install rpy2
 RUN pip3 install --no-cache-dir rpy2
 
 # clean
