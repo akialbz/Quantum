@@ -17,11 +17,6 @@ RUN set -ex \
        curl \
        build-essential
 
-# install venv
-RUN set -ex \
-    && pip3 install --upgrade --no-cache-dir pip \
-    && pip3 install --no-cache-dir virtualenv
-
 # install JupyterLab
 # node.js
 ENV NODE_OPTIONS="--max-old-space-size=4096" 
@@ -59,6 +54,41 @@ RUN set -ex \
     && jlpm cache clean \
     && npm cache clean --force
 
+# config Jupyter
+COPY passwdcfg /usr/local/
+RUN set -ex \
+    && jupyter notebook --generate-config \
+    && cat /usr/local/passwdcfg >> /root/.jupyter/jupyter_server_config.json \
+    && rm /usr/local/passwdcfg
+
+# install conda
+RUN set -ex \
+    && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh \
+    && bash miniconda.sh -bfp /usr/local/conda/ \
+    && ln -s /usr/local/conda/bin/conda /usr/local/bin/conda \
+    && rm -rf miniconda.sh \
+    && conda config --set auto_activate_base false
+
+# install beamspy kernel
+RUN set -ex \
+    && conda create -n beamspy beamspy python=3 -c conda-forge -c bioconda -c computational-metabolomics \
+    && conda run --no-capture-output -n beamspy \
+       pip install --no-cache-dir ipykernel \
+    && conda run --no-capture-output -n beamspy \
+       python -m ipykernel install --user --name=beamspy \
+    && conda clean --all --yes
+
+# install lazypredict kernel
+RUN set -ex \
+    && conda create -n lazypredict python=3.9 -c conda-forge \
+    && conda run --no-capture-output -n lazypredict \
+       pip install --no-cache-dir hypothesis pytest requests tables kagami ipykernel \
+    && conda run --no-capture-output -n lazypredict \
+       pip install --no-cache-dir lazypredict \
+    && conda run --no-capture-output -n lazypredict \
+       python -m ipykernel install --user --name=lazypredict \
+    && conda clean --all --yes
+
 # clean
 RUN set -ex \
     && apt-get purge -y \
@@ -70,14 +100,7 @@ RUN set -ex \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 
-# config Jupyter
-COPY passwdcfg /usr/local/
-RUN set -ex \
-    && jupyter notebook --generate-config \
-    && cat /usr/local/passwdcfg >> /root/.jupyter/jupyter_server_config.json \
-    && rm /usr/local/passwdcfg
-
-# set work dirs
+# set lib dirs
 RUN set -ex \
     && mkdir -p /home/share/python/dist-packages/
 ENV PYTHONPATH /home/share/python/dist-packages/
