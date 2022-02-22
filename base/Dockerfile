@@ -5,7 +5,7 @@
 # origin: 11-05-2018
 #
 
-FROM python:3.9-slim-bullseye
+FROM python:3.10-slim-bullseye
 
 # install dependencies
 RUN set -ex \
@@ -13,12 +13,14 @@ RUN set -ex \
     && apt-get install -y --no-install-recommends \
        libhdf5-dev \
        libopenmpi-dev \
+       curl \
        build-essential
 
 # install Python packages
 RUN set -ex \
     && pip3 install --no-cache-dir --upgrade pip \
     && pip3 install --no-cache-dir \
+       virtualenv \
        hypothesis \
        pytest \
        mpi4py \
@@ -32,11 +34,18 @@ RUN set -ex \
        tables \
        kagami
 
+# install conda
+RUN set -ex \
+    && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh \
+    && bash miniconda.sh -bfp /usr/local/conda/ \
+    && ln -s /usr/local/conda/bin/conda /usr/local/bin/conda \
+    && rm -rf miniconda.sh \
+    && conda config --set auto_activate_base false
+
 # clean
 RUN set -ex \
     && apt-get purge -y \
        libhdf5-dev \
-       build-essential \
     && apt-get --purge autoremove -y \
     && apt-get autoclean -y \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
@@ -48,6 +57,4 @@ RUN set -ex \
 WORKDIR /home/docker/
 
 # set entry
-RUN set -ex \
-    && pip3 install --no-cache-dir ipython ipykernel
-CMD python -m ipykernel_launcher -f $DOCKERNEL_CONNECTION_FILE
+CMD bash

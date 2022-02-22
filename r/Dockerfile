@@ -60,7 +60,7 @@ RUN set -ex \
     && /usr/sbin/update-locale LANG=en_US.UTF-8
 
 RUN set -ex \
-    && apt-key adv --keyserver keyserver.ubuntu.com --recv-key 'E19F5F87128899B192B1A2C2AD5F960A256A04AF' \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-key '95C0FAF38DB3CCAD0C080A7BDC78B2DDEABC47B7' \
     && echo "deb http://cloud.r-project.org/bin/linux/debian bullseye-cran40/" >> /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -t bullseye-cran40 -y --no-install-recommends \
@@ -100,6 +100,9 @@ RUN R -e 'install.packages(c( \
             "gplots", \
             "plotly" \
           ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
+
+RUN set -ex \
+    && apt-get install -y --no-install-recommends harfbuzz fribidi
 
 RUN R -e 'install.packages("BiocManager"); \
           BiocManager::install(c( \

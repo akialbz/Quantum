@@ -58,6 +58,7 @@ RUN set -ex \
 COPY passwdcfg /usr/local/
 RUN set -ex \
     && jupyter notebook --generate-config \
+    && cp /root/.jupyter/jupyter_server_config.json /root/.jupyter/jupyter_server_config.json.bk \
     && cat /usr/local/passwdcfg >> /root/.jupyter/jupyter_server_config.json \
     && rm /usr/local/passwdcfg
 
@@ -68,15 +69,6 @@ RUN set -ex \
     && ln -s /usr/local/conda/bin/conda /usr/local/bin/conda \
     && rm -rf miniconda.sh \
     && conda config --set auto_activate_base false
-
-# install beamspy kernel
-RUN set -ex \
-    && conda create -n beamspy beamspy python=3 -c conda-forge -c bioconda -c computational-metabolomics \
-    && conda run --no-capture-output -n beamspy \
-       pip install --no-cache-dir ipykernel \
-    && conda run --no-capture-output -n beamspy \
-       python -m ipykernel install --user --name=beamspy \
-    && conda clean --all --yes
 
 # install lazypredict kernel
 RUN set -ex \
