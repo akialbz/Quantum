@@ -1,12 +1,11 @@
 #
-# Modified from official Python and R Dockerfiles
-# JupyterLab included
+# Docker image with JupyterLab
 #
 # author(s): Albert (aki) Zhou
 # origin: 11-05-2018
 #
 
-FROM akialbz/quantum:dev
+FROM akialbz/quantum:dev-with-r
 
 # install dependencies
 RUN set -ex \
@@ -14,8 +13,9 @@ RUN set -ex \
     && apt-get install -y --no-install-recommends \ 
        libzmq5 \
        libzmq5-dev \
-       curl \
-       build-essential
+       libunwind8 \
+       libunwind-dev \
+       curl
 
 # install JupyterLab
 # node.js
@@ -32,6 +32,16 @@ RUN set -ex \
        jedi \
        ipykernel \
     && R -e 'install.packages("IRkernel", repos="https://cloud.r-project.org/"); IRkernel::installspec()'
+
+# python packages
+RUN set -ex \
+    && pip3 install --upgrade --no-cache-dir pip \
+    && pip3 install --no-cache-dir \
+       virtualenv \
+       matplotlib \
+       seaborn \
+       plotly \
+       bokeh
 
 # extensions
 RUN set -ex \
@@ -58,7 +68,6 @@ RUN set -ex \
 COPY passwdcfg /usr/local/
 RUN set -ex \
     && jupyter notebook --generate-config \
-    && cp /root/.jupyter/jupyter_server_config.json /root/.jupyter/jupyter_server_config.json.bk \
     && cat /usr/local/passwdcfg >> /root/.jupyter/jupyter_server_config.json \
     && rm /usr/local/passwdcfg
 
@@ -70,25 +79,15 @@ RUN set -ex \
     && rm -rf miniconda.sh \
     && conda config --set auto_activate_base false
 
-# install lazypredict kernel
-RUN set -ex \
-    && conda create -n lazypredict python=3.9 -c conda-forge \
-    && conda run --no-capture-output -n lazypredict \
-       pip install --no-cache-dir hypothesis pytest requests tables kagami ipykernel \
-    && conda run --no-capture-output -n lazypredict \
-       pip install --no-cache-dir lazypredict \
-    && conda run --no-capture-output -n lazypredict \
-       python -m ipykernel install --user --name=lazypredict \
-    && conda clean --all --yes
-
 # clean
 RUN set -ex \
     && apt-get purge -y \
        libzmq5-dev \
+       libunwind-dev \
        curl \
-       build-essential \
     && apt-get --purge autoremove -y \
     && apt-get autoclean -y \
+    && apt-get clean -y \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 

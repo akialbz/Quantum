@@ -5,20 +5,47 @@
 # origin: 11-05-2018
 #
 
-FROM akialbz/quantum:base-with-r
+FROM python:3.9-slim-bullseye
+
+# install dependencies
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+       libhdf5-dev \
+       build-essential
 
 # install Python packages
 RUN set -ex \
-    && pip3 install --upgrade --no-cache-dir pip \
+    && pip3 install --no-cache-dir --upgrade pip \
     && pip3 install --no-cache-dir \
-       fastcluster \
+       hypothesis \
+       pytest \
+       numpy \
+       scipy \
+       pandas \
        statsmodels \
-       seaborn \
        scikit-learn \
-       imbalanced-learn \
-       scikit-fuzzy \
        python-igraph \
        networkx \
-       matplotlib \
-       plotly \
-       pyvis
+       requests \
+       pysocks \
+       tables \
+       kagami
+
+# clean
+RUN set -ex \
+    && apt-get purge -y \
+       libhdf5-dev \
+    && apt-get --purge autoremove -y \
+    && apt-get autoclean -y \
+    && apt-get clean -y \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && rm -rf /var/lib/apt/lists/*
+
+# set work dirs
+RUN set -ex \
+    && mkdir -p /home/docker/
+WORKDIR /home/docker/
+
+# set entry
+CMD bash

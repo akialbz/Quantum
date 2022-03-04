@@ -1,16 +1,16 @@
 #
-# RStudio server with bioinformatics packages included
+# Docker image ACS
 #
 # author(s): Albert (aki) Zhou
 # origin: 11-05-2018
 #
 
-FROM rocker/rstudio:latest
+FROM akialbz/quantum:lab
 
 # install dependencies
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends \ 
        libblas3 \
        libblas-dev \
        liblapack3 \
@@ -29,23 +29,32 @@ RUN set -ex \
        libbz2-dev \
        liblzma5 \
        liblzma-dev \
-       libjpeg-turbo8 \
-       libjpeg-dev \
+       libjpeg62-turbo \
+       libjpeg62-turbo-dev \
        libunwind8 \
        libunwind-dev \
        libfreetype6 \
        libfreetype6-dev \
        zlib1g \
        zlib1g-dev \
-       cmake \
        gfortran \
        git \
        curl \
        wget \
        default-jre \
-       default-jdk \
-       libopenmpi-dev \
-       build-essential
+       default-jdk 
+
+# install Python packages
+RUN set -ex \
+    && pip3 install --upgrade --no-cache-dir pip \
+    && pip3 install --no-cache-dir \
+    #    fastcluster \
+       bottleneck \
+       imbalanced-learn \
+       scikit-fuzzy \
+       mvlearn \
+       pyvis \
+       yellowbrick
 
 # install R packages
 RUN R CMD javareconf
@@ -54,59 +63,51 @@ RUN R -e 'install.packages(c( \
             "devtools", \
             "rJava", \
             # data manipulation
-            "reshape", \
             "tidyverse", \
             "dplyr", \
             # matrix decomposition
-            "RGCCA", \
             "umap", \
             "Rtsne", \
-            # graph
-            "igraph", \
-            "dynamicTreeCut", \
             # machine learning 
             "caret", \
             "mlr3", \
-            "kernlab", \
-            "randomForest", \
-            "rpart", \
-            "bartMachine", \
             # visualisation
-            "factoextra", \
-            "pheatmap", \
             "gplots", \
-            "plotly", \
-            # iRF
-            "ranger", \
-            "AUC", \
-            "doMC", \
-            "rgl", \
-            "microbenchmark", \
-            "profvis", \
-            # xai
-            "iml", \
-            "lime" \
+            "plotly" \
           ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
 
 RUN R -e 'install.packages("BiocManager"); \
           BiocManager::install(c( \
             # RNA-Seq
             "DESeq2", \
-            "GSEABase", \
             "limma", \
             "sva", \
             # multiomics
             "mixOmics", \
-            "omicade4", \
             "MOFA2", \
-            "MOFAdata", \
             # graph
             "WGCNA" \
           ), suppressUpdates = F, ask = F, clean = T)'
 
-RUN R -e 'devtools::install_github("isglobal-brge/rexposome"); \
-          devtools::install_github("isglobal-brge/omicRexposome"); \
-          devtools::install_github("karlkumbier/iRF2.0")'
+# install beamspy kernel
+RUN set -ex \
+    && conda create -n beamspy beamspy python=3 -c conda-forge -c bioconda -c computational-metabolomics \
+    && conda run --no-capture-output -n beamspy \
+       pip install --no-cache-dir ipykernel \
+    && conda run --no-capture-output -n beamspy \
+       python -m ipykernel install --user --name=BEAMSpy \
+    && conda clean --all --yes
+
+# install lazypredict kernel
+RUN set -ex \
+    && conda create -n lazypredict python=3.9 -c conda-forge \
+    && conda run --no-capture-output -n lazypredict \
+       pip install --no-cache-dir hypothesis pytest requests tables kagami ipykernel \
+    && conda run --no-capture-output -n lazypredict \
+       pip install --no-cache-dir lazypredict \
+    && conda run --no-capture-output -n lazypredict \
+       python -m ipykernel install --user --name=LazyPredict \
+    && conda clean --all --yes
 
 # clean
 RUN set -ex \
@@ -120,7 +121,7 @@ RUN set -ex \
        libpcre2-dev \
        libbz2-dev \
        liblzma-dev \
-       libjpeg-dev \
+       libjpeg62-turbo-dev \
        libunwind-dev \
        libfreetype6-dev \
        zlib1g-dev \

@@ -1,16 +1,16 @@
 #
-# Modified from official R Dockerfiles
+# Docker image with JupyterLab for AI/ML
 #
 # author(s): Albert (aki) Zhou
 # origin: 11-05-2018
 #
 
-FROM debian:bullseye-slim
+FROM akialbz/quantum:lab
 
 # install dependencies
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y --no-install-recommends \ 
+    && apt-get install -y --no-install-recommends \
        libblas3 \
        libblas-dev \
        liblapack3 \
@@ -23,49 +23,28 @@ RUN set -ex \
        libssl-dev \
        libpng16-16 \
        libpng-dev \
+       libpcre2-8-0 \
+       libpcre2-dev \
+       libbz2-1.0 \
+       libbz2-dev \
+       liblzma5 \
+       liblzma-dev \
        libjpeg62-turbo \
        libjpeg62-turbo-dev \
-       libzmq5 \
-       libzmq5-dev \
        libunwind8 \
        libunwind-dev \
        libfreetype6 \
        libfreetype6-dev \
        zlib1g \
        zlib1g-dev \
+       cmake \
+       gfortran \
        git \
-       locales \
-       gnupg \
        curl \
        wget \
        default-jre \
        default-jdk \
-       build-essential
-
-RUN set -ex \
-    && wget --no-check-certificate https://github.com/jgm/pandoc/releases/download/2.14.2/pandoc-2.14.2-linux-amd64.tar.gz \
-    && tar -zxf pandoc-2.14.2-linux-amd64.tar.gz \
-    && mv pandoc-2.14.2/bin/* /usr/local/bin/ \
-    && mkdir -p /usr/local/share/man/man1/ \
-    && mv pandoc-2.14.2/share/man/man1/* /usr/local/share/man/man1/ \
-    && rm -rf pandoc-2.14.2
-
-# install latest R
-ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-
-RUN set -ex \
-    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
-    && locale-gen en_US.utf8 \
-    && /usr/sbin/update-locale LANG=en_US.UTF-8
-
-RUN set -ex \
-    && apt-key adv --keyserver keyserver.ubuntu.com --recv-key '95C0FAF38DB3CCAD0C080A7BDC78B2DDEABC47B7' \
-    && echo "deb http://cloud.r-project.org/bin/linux/debian bullseye-cran40/" >> /etc/apt/sources.list \
-    && apt-get update \
-    && apt-get install -t bullseye-cran40 -y --no-install-recommends \
-       r-base \
-       r-base-dev
+       libopenmpi-dev
 
 # install R packages
 RUN R CMD javareconf
@@ -74,35 +53,39 @@ RUN R -e 'install.packages(c( \
             "devtools", \
             "rJava", \
             # data manipulation
+            "reshape", \
             "tidyverse", \
             "dplyr", \
             # matrix decomposition
             "RGCCA", \
             "umap", \
+            "Rtsne", \
             # graph
             "igraph", \
             "dynamicTreeCut", \
             # machine learning 
             "caret", \
-            "mlr", \
+            "mlr3", \
             "kernlab", \
             "randomForest", \
             "rpart", \
             "bartMachine", \
-            # ecology
-            "vegan", \
-            "ade4", \
-            # single cell
-            "Seurat", \
             # visualisation
             "factoextra", \
             "pheatmap", \
             "gplots", \
-            "plotly" \
+            "plotly", \
+            # iRF
+            "ranger", \
+            "AUC", \
+            "doMC", \
+            "rgl", \
+            "microbenchmark", \
+            "profvis", \
+            # xai
+            "iml", \
+            "lime" \
           ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
-
-RUN set -ex \
-    && apt-get install -y --no-install-recommends harfbuzz fribidi
 
 RUN R -e 'install.packages("BiocManager"); \
           BiocManager::install(c( \
@@ -111,9 +94,6 @@ RUN R -e 'install.packages("BiocManager"); \
             "GSEABase", \
             "limma", \
             "sva", \
-            # single cell
-            "scater", \
-            "harmony", \
             # multiomics
             "mixOmics", \
             "omicade4", \
@@ -124,35 +104,64 @@ RUN R -e 'install.packages("BiocManager"); \
           ), suppressUpdates = F, ask = F, clean = T)'
 
 RUN R -e 'devtools::install_github("isglobal-brge/rexposome"); \
-          devtools::install_github("isglobal-brge/omicRexposome")'
+          devtools::install_github("isglobal-brge/omicRexposome"); \
+          devtools::install_github("karlkumbier/iRF2.0")'
+
+# install Python packages
+RUN set -ex \
+    && pip3 install --upgrade --no-cache-dir pip \
+    && pip3 install --no-cache-dir \
+       mpi4py \
+       numba \
+       mpmath \
+       numexpr \
+       imbalanced-learn \
+       mvlearn \
+       MKLpy \
+       pyrcca \
+       LIME \
+       SHAP \
+       pyvis \
+       Yellowbrick
+
+# install lazypredict kernel
+RUN set -ex \
+    && conda create -n lazypredict python=3.9 -c conda-forge \
+    && conda run --no-capture-output -n lazypredict \
+       pip install --no-cache-dir hypothesis pytest requests tables kagami ipykernel \
+    && conda run --no-capture-output -n lazypredict \
+       pip install --no-cache-dir lazypredict \
+    && conda run --no-capture-output -n lazypredict \
+       python -m ipykernel install --user --name=LazyPredict \
+    && conda clean --all --yes
+
+# install Keras kernel
+RUN set -ex \
+    && conda create -n keras pytorch torchvision torchaudio cpuonly tensorflow keras h5py python=3 -c pytorch \
+    && conda run --no-capture-output -n keras \
+       pip install --no-cache-dir ipykernel \
+    && conda run --no-capture-output -n keras \
+       python -m ipykernel install --user --name=Keras \
+    && conda clean --all --yes
 
 # clean
 RUN set -ex \
     && apt-get purge -y \
-       libzmq5-dev \
-       libunwind-dev \
-       libfreetype6-dev \
        libblas-dev \
        liblapack-dev \
        libcurl4-openssl-dev \
        libxml2-dev \
        libssl-dev \
        libpng-dev \
+       libpcre2-dev \
+       libbz2-dev \
+       liblzma-dev \
        libjpeg62-turbo-dev \
+       libunwind-dev \
+       libfreetype6-dev \
        zlib1g-dev \
-       r-base-dev \
-       curl \
-       wget \
-       build-essential \
     && apt-get --purge autoremove -y \
     && apt-get autoclean -y \
+    && apt-get clean -y \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
-
-# set work dirs
-RUN set -ex \
-    && mkdir -p /home/docker/
-WORKDIR /home/docker/
-
-# set entry
-CMD R
