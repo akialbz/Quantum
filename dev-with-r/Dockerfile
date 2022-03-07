@@ -27,6 +27,7 @@ RUN set -ex \
     && mv pandoc-${PANDOC_VERSION}/bin/* /usr/local/bin/ \
     && mkdir -p /usr/local/share/man/man1/ \
     && mv pandoc-${PANDOC_VERSION}/share/man/man1/* /usr/local/share/man/man1/ \
+    && rm pandoc-${PANDOC_VERSION}-linux-amd64.tar.gz \
     && rm -rf pandoc-${PANDOC_VERSION}
 
 # install latest R
