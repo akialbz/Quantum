@@ -53,6 +53,13 @@ RUN R -e 'install.packages(c( \
             # utils
             "devtools", \
             "rJava", \
+            "shiny" \
+          ), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
+
+RUN R -e 'install.packages(c( \
+            # utils
+            "devtools", \
+            "rJava", \
             # data manipulation
             "reshape", \
             "tidyverse", \
