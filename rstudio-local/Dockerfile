@@ -1,5 +1,5 @@
 #
-# RStudio server with bioinformatics packages included
+# RStudio app with AI/ML toolkits
 # No auth, local usage only
 #
 # author(s): Albert (aki) Zhou
