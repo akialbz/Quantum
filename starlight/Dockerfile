@@ -89,12 +89,14 @@ RUN set -ex \
 # -------------------------------------------------------------
 RUN set -ex \
     && apt-get install -y --no-install-recommends git \
-    && install2.r --error -- --clean languageserver \
+    # && install2.r --error -- --clean languageserver \
     && pip3 install --no-cache-dir \
+       jupyterlab-git \
+       neptune-notebooks \
     #    elyra-pipeline-editor-extension \
     #    elyra-code-snippet-extension \
-       elyra-python-editor-extension \
-       elyra-r-editor-extension \
+    #    elyra-python-editor-extension \
+    #    elyra-r-editor-extension \
     && jupyter lab build --name='Quantum Starlight' \
     && jupyter lab clean \
     && jlpm cache clean \
