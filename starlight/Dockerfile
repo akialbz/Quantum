@@ -85,7 +85,7 @@ RUN set -ex \
     && conda clean --all --yes
 
 
-# update JupyterLab extensions
+# update JupyterLab extensions & themes
 # -------------------------------------------------------------
 RUN set -ex \
     && apt-get install -y --no-install-recommends git \
@@ -93,6 +93,9 @@ RUN set -ex \
     && pip3 install --no-cache-dir \
        jupyterlab-git \
        neptune-notebooks \
+       jupyterlab-material-night-eighties \
+       jupyterlab-horizon-theme \
+       theme-darcula \
     #    elyra-pipeline-editor-extension \
     #    elyra-code-snippet-extension \
     #    elyra-python-editor-extension \
