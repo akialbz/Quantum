@@ -6,7 +6,7 @@
 #
 
 
-FROM rocker/rstudio:latest
+FROM rocker/rstudio:latest-daily
 
 
 RUN apt-get update
@@ -14,8 +14,25 @@ RUN apt-get update
 
 # install R basis
 RUN apt-get install -y --no-install-recommends \
+    libpcre2-dev \
+    libbz2-dev \
+    zlib1g-dev \
+    liblzma-dev \
+    libicu-dev \
+    libz-dev \
+    libxml2-dev \
+    libfontconfig1-dev \
+    libgit2-dev \
+    libglpk-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
     default-jre \
-    default-jdk
+    default-jdk \
+    cmake
 
 RUN set -ex \
     && R CMD javareconf \
@@ -28,12 +45,6 @@ RUN install2.r --error -- --clean devtools BiocManager
 
 
 # # install R packages
-RUN apt-get install -y --no-install-recommends \
-    zlib1g \
-    libz-dev \
-    libglpk40 \
-    libglpk-dev
-
 RUN install2.r --error -- --clean \
     # data manipulation
     reshape \
@@ -95,10 +106,6 @@ RUN installGithub.r \
 
 
 # clean
-RUN apt-get purge -y \
-    libz-dev \
-    libglpk-dev
-
 RUN set -ex \
     && apt-get --purge autoremove -y \
     && apt-get autoclean -y \
