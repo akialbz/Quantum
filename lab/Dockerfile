@@ -6,13 +6,13 @@
 #
 
 
-FROM akialbz/quantum:acs
+FROM akialbz/quantum:acs-arm64
 
 
 # install conda
 # -------------------------------------------------------------
 RUN set -ex \
-    && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh \
+    && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh -o miniconda.sh \
     && bash miniconda.sh -bfp /usr/local/conda/ \
     && ln -s /usr/local/conda/bin/conda /usr/local/bin/conda \
     && rm -rf miniconda.sh \
@@ -25,7 +25,7 @@ RUN set -ex \
 ENV NODE_OPTIONS="--max-old-space-size=4096" 
 RUN set -ex \
     && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y --no-install-recommends nodejs 
+    && apt install -y --no-install-recommends nodejs 
 
 RUN pip3 install --no-cache-dir jupyterlab jedi ipykernel
 
@@ -58,10 +58,10 @@ RUN set -ex \
 # clean apt
 # -------------------------------------------------------------
 RUN set -ex \
-    && apt-get --purge autoremove -y \
-    && apt-get autoclean -y \
-    && apt-get clean -y \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && apt --purge autoremove -y \
+    && apt autoclean -y \
+    && apt clean -y \
+    && apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 
 

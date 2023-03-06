@@ -6,13 +6,12 @@
 #
 
 
-FROM akialbz/quantum:lab
+FROM akialbz/quantum:lab-arm64
 
 
 # install additional Python packages
 # -------------------------------------------------------------
 RUN set -ex \
-    && pip3 install --upgrade --no-cache-dir pip \
     && pip3 install --no-cache-dir \
        # statistical & ML
        fitter \
@@ -22,7 +21,10 @@ RUN set -ex \
        SHAP \
        scikit-fuzzy \
        pymoo \
+       mrmr_selection \
        umap-learn \
+       mofapy2 \
+       mofax \
        # visualisation
        seaborn \
        yellowbrick \
@@ -35,16 +37,7 @@ RUN set -ex \
 RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-       zlib1g \
        zlib1g-dev \
-       libblas3 \
-       libblas-dev \
-       liblapack3 \
-       liblapack-dev \
-       libxml2 \
-       libxml2-dev \
-       libpng16-16 \
-       libpng-dev \
        gfortran
 
 RUN install2.r --error -- --clean \
@@ -63,6 +56,7 @@ RUN install2.r --error -- --clean \
     doMC
 
 RUN installBioc.r --error -- --clean \
+    cqn \
     DESeq2 \
     limma \
     sva \
@@ -71,49 +65,50 @@ RUN installBioc.r --error -- --clean \
 
 RUN installGithub.r karlkumbier/iRF2.0
 
-RUN apt-get purge -y \
-    zlib1g-dev \
-    libblas-dev \
-    liblapack-dev \
-    libxml2-dev \
-    libpng-dev
-
 
 # install additional kernels
 # -------------------------------------------------------------
 # Keras kernels
 RUN set -ex \
-    && conda create -n keras tensorflow keras python=3 \
+    && conda create -n keras keras tensorflow python=3 \
     && conda run --no-capture-output -n keras \
        pip install --no-cache-dir ipykernel \
     && conda run --no-capture-output -n keras \
        python -m ipykernel install --user --name=Keras --display-name="Keras (CPU)" \
     && conda clean --all --yes
 
-RUN set -ex \
-    && conda create -n keras-gpu tensorflow-gpu keras python=3 \
-    && conda run --no-capture-output -n keras-gpu \
-       pip install --no-cache-dir ipykernel \
-    && conda run --no-capture-output -n keras-gpu \
-       python -m ipykernel install --user --name=Keras_GPU --display-name="Keras (GPU)" \
-    && conda clean --all --yes
+# RUN set -ex \
+#     && conda create -n keras-gpu keras-gpu tensorflow-gpu python=3 \
+#     && conda run --no-capture-output -n keras-gpu \
+#        pip install --no-cache-dir ipykernel \
+#     && conda run --no-capture-output -n keras-gpu \
+#        python -m ipykernel install --user --name=Keras_GPU --display-name="Keras (GPU)" \
+#     && conda clean --all --yes
 
 # PyTorch kernels
 RUN set -ex \
-    && conda create -n pytorch pytorch torchvision torchaudio cpuonly python=3 -c pytorch\
+    && conda create -n pytorch pytorch numpy python=3 -c kumatea\
     && conda run --no-capture-output -n pytorch \
        pip install --no-cache-dir ipykernel \
     && conda run --no-capture-output -n pytorch \
        python -m ipykernel install --user --name=PyTorch --display-name="PyTorch (CPU)" \
     && conda clean --all --yes
 
-RUN set -ex \
-    && conda create -n pytorch-gpu pytorch torchvision torchaudio cudatoolkit=11.3 python=3 -c pytorch\
-    && conda run --no-capture-output -n pytorch-gpu \
-       pip install --no-cache-dir ipykernel \
-    && conda run --no-capture-output -n pytorch-gpu \
-       python -m ipykernel install --user --name=PyTorch_GPU --display-name="PyTorch (GPU)" \
-    && conda clean --all --yes
+# RUN set -ex \
+#     && conda create -n pytorch pytorch torchvision torchaudio cpuonly python=3 -c pytorch\
+#     && conda run --no-capture-output -n pytorch \
+#        pip install --no-cache-dir ipykernel \
+#     && conda run --no-capture-output -n pytorch \
+#        python -m ipykernel install --user --name=PyTorch --display-name="PyTorch (CPU)" \
+#     && conda clean --all --yes
+
+# RUN set -ex \
+#     && conda create -n pytorch-gpu pytorch torchvision torchaudio pytorch-cuda=11.6 python=3 -c pytorch -c nvidia\
+#     && conda run --no-capture-output -n pytorch-gpu \
+#        pip install --no-cache-dir ipykernel \
+#     && conda run --no-capture-output -n pytorch-gpu \
+#        python -m ipykernel install --user --name=PyTorch_GPU --display-name="PyTorch (GPU)" \
+#     && conda clean --all --yes
 
 
 # update JupyterLab extensions
@@ -124,6 +119,9 @@ RUN set -ex \
     && pip3 install --no-cache-dir \
        jupyterlab-git \
        neptune-notebooks \
+       jupyterlab-material-night-eighties \
+       jupyterlab-horizon-theme \
+       theme-darcula \
     #    elyra-pipeline-editor-extension \
     #    elyra-code-snippet-extension \
     #    elyra-python-editor-extension \

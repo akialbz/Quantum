@@ -6,13 +6,12 @@
 #
 
 
-FROM akialbz/quantum:lab
+FROM akialbz/quantum:lab-arm64
 
 
 # install additional Python packages
 # -------------------------------------------------------------
 RUN set -ex \
-    && pip3 install --upgrade --no-cache-dir pip \
     && pip3 install --no-cache-dir \
        # statistical & ML
        fitter \
@@ -36,39 +35,24 @@ RUN set -ex \
 # install additional R packages
 # -------------------------------------------------------------
 RUN set -ex \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-       zlib1g \
+    && apt update \
+    && apt install -y --no-install-recommends \
        zlib1g-dev \
-       libblas3 \
-       libblas-dev \
-       liblapack3 \
-       liblapack-dev \
-       libxml2 \
-       libxml2-dev \
-       libpng16-16 \
-       libpng-dev \
        gfortran
 
 RUN install2.r --error -- --clean \
     reshape \
     tidyverse \
-    dplyr
+    dplyr 
 
 RUN installBioc.r --error -- --clean \
+    cqn \
     DESeq2 \
     limma \
     sva \
     mixOmics
 
 RUN installGithub.r karlkumbier/iRF2.0
-
-RUN apt-get purge -y \
-    zlib1g-dev \
-    libblas-dev \
-    liblapack-dev \
-    libxml2-dev \
-    libpng-dev
 
 
 # install additional kernels
@@ -88,18 +72,13 @@ RUN set -ex \
 # update JupyterLab extensions & themes
 # -------------------------------------------------------------
 RUN set -ex \
-    && apt-get install -y --no-install-recommends git \
-    # && install2.r --error -- --clean languageserver \
+    && apt install -y --no-install-recommends git \
     && pip3 install --no-cache-dir \
        jupyterlab-git \
        neptune-notebooks \
        jupyterlab-material-night-eighties \
        jupyterlab-horizon-theme \
        theme-darcula \
-    #    elyra-pipeline-editor-extension \
-    #    elyra-code-snippet-extension \
-    #    elyra-python-editor-extension \
-    #    elyra-r-editor-extension \
     && jupyter lab build --name='Quantum Starlight' \
     && jupyter lab clean \
     && jlpm cache clean \
@@ -109,10 +88,10 @@ RUN set -ex \
 # clean apt
 # -------------------------------------------------------------
 RUN set -ex \
-    && apt-get --purge autoremove -y \
-    && apt-get autoclean -y \
-    && apt-get clean -y \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && apt --purge autoremove -y \
+    && apt autoclean -y \
+    && apt clean -y \
+    && apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 
 

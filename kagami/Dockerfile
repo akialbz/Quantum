@@ -6,24 +6,27 @@
 #
 
 
-FROM python:3.9-slim-bullseye
+FROM ubuntu:jammy
 
 
 # install dependencies
 RUN set -ex \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-       libblas3 \
+    && apt update \
+    && apt install -y --no-install-recommends \
        libblas-dev \
-       liblapack3 \
        liblapack-dev \
        libhdf5-dev \
-       build-essential
+       libssl-dev \
+       libffi-dev \
+       python3-dev \
+       build-essential \
+       curl \
+       wget \
+       python3-pip
 
 
 # install Python packages
 RUN set -ex \
-    && pip3 install --no-cache-dir --upgrade pip \
     && pip3 install --no-cache-dir \
        # base
        requests \
@@ -31,6 +34,7 @@ RUN set -ex \
        hypothesis \
        typing-extensions \
        pytest \
+       pooch \
        # numeric
        numpy \
        scipy \
@@ -43,18 +47,17 @@ RUN set -ex \
 
 # clean apt
 RUN set -ex \
-    && apt-get purge -y \
-       libblas-dev \
-       liblapack-dev \
-       libhdf5-dev \
-    && apt-get --purge autoremove -y \
-    && apt-get autoclean -y \
-    && apt-get clean -y \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && apt --purge autoremove -y \
+    && apt autoclean -y \
+    && apt clean -y \
+    && apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
 
 
 # set dirs
+# alias Python
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 # python lib dir
 RUN mkdir -p /home/share/python/dist-packages/
 ENV PYTHONPATH /home/share/python/dist-packages/
