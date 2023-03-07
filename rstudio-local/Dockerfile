@@ -6,6 +6,6 @@
 # origin: 11-05-2018
 #
 
-FROM akialbz/quantum:rstudio-arm64
+FROM akialbz/quantum:rstudio
 
 ENV DISABLE_AUTH=true

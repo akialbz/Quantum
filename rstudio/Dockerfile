@@ -6,7 +6,7 @@
 #
 
 
-FROM rocker/rstudio:latest-daily
+FROM rocker/rstudio:latest
 
 
 RUN apt-get update

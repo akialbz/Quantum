@@ -6,7 +6,7 @@
 #
 
 
-FROM akialbz/quantum:lab-arm64
+FROM akialbz/quantum:lab
 
 
 # install additional Python packages
@@ -77,38 +77,30 @@ RUN set -ex \
        python -m ipykernel install --user --name=Keras --display-name="Keras (CPU)" \
     && conda clean --all --yes
 
-# RUN set -ex \
-#     && conda create -n keras-gpu keras-gpu tensorflow-gpu python=3 \
-#     && conda run --no-capture-output -n keras-gpu \
-#        pip install --no-cache-dir ipykernel \
-#     && conda run --no-capture-output -n keras-gpu \
-#        python -m ipykernel install --user --name=Keras_GPU --display-name="Keras (GPU)" \
-#     && conda clean --all --yes
+RUN set -ex \
+    && conda create -n keras-gpu keras-gpu tensorflow-gpu python=3 \
+    && conda run --no-capture-output -n keras-gpu \
+       pip install --no-cache-dir ipykernel \
+    && conda run --no-capture-output -n keras-gpu \
+       python -m ipykernel install --user --name=Keras_GPU --display-name="Keras (GPU)" \
+    && conda clean --all --yes
 
 # PyTorch kernels
 RUN set -ex \
-    && conda create -n pytorch pytorch numpy python=3 -c kumatea\
+    && conda create -n pytorch pytorch torchvision torchaudio cpuonly python=3 -c pytorch\
     && conda run --no-capture-output -n pytorch \
        pip install --no-cache-dir ipykernel \
     && conda run --no-capture-output -n pytorch \
        python -m ipykernel install --user --name=PyTorch --display-name="PyTorch (CPU)" \
     && conda clean --all --yes
 
-# RUN set -ex \
-#     && conda create -n pytorch pytorch torchvision torchaudio cpuonly python=3 -c pytorch\
-#     && conda run --no-capture-output -n pytorch \
-#        pip install --no-cache-dir ipykernel \
-#     && conda run --no-capture-output -n pytorch \
-#        python -m ipykernel install --user --name=PyTorch --display-name="PyTorch (CPU)" \
-#     && conda clean --all --yes
-
-# RUN set -ex \
-#     && conda create -n pytorch-gpu pytorch torchvision torchaudio pytorch-cuda=11.6 python=3 -c pytorch -c nvidia\
-#     && conda run --no-capture-output -n pytorch-gpu \
-#        pip install --no-cache-dir ipykernel \
-#     && conda run --no-capture-output -n pytorch-gpu \
-#        python -m ipykernel install --user --name=PyTorch_GPU --display-name="PyTorch (GPU)" \
-#     && conda clean --all --yes
+RUN set -ex \
+    && conda create -n pytorch-gpu pytorch torchvision torchaudio pytorch-cuda=11.6 python=3 -c pytorch -c nvidia\
+    && conda run --no-capture-output -n pytorch-gpu \
+       pip install --no-cache-dir ipykernel \
+    && conda run --no-capture-output -n pytorch-gpu \
+       python -m ipykernel install --user --name=PyTorch_GPU --display-name="PyTorch (GPU)" \
+    && conda clean --all --yes
 
 
 # update JupyterLab extensions
