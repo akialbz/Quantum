@@ -30,6 +30,8 @@ RUN apt-get install -y --no-install-recommends \
     libpng-dev \
     libtiff5-dev \
     libjpeg-dev \
+    libglu1-mesa \
+    libopengl0 \
     default-jre \
     default-jdk \
     cmake
