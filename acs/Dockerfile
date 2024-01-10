@@ -6,7 +6,7 @@
 #
 
 
-FROM akialbz/quantum:kagami-arm64
+FROM akialbz/quantum:kagami
 
 
 # install additional Python packages

@@ -6,7 +6,7 @@
 #
 
 
-FROM akialbz/quantum:lab-arm64
+FROM akialbz/quantum:lab
 
 
 # install additional Python packages

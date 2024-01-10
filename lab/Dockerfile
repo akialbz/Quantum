@@ -6,7 +6,7 @@
 #
 
 
-FROM akialbz/quantum:acs-arm64
+FROM akialbz/quantum:acs
 
 
 # install conda
