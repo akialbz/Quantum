@@ -12,7 +12,7 @@ FROM akialbz/quantum:acs
 # install conda
 # -------------------------------------------------------------
 RUN set -ex \
-    && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh -o miniconda.sh \
+    && curl -L https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh \
     && bash miniconda.sh -bfp /usr/local/conda/ \
     && ln -s /usr/local/conda/bin/conda /usr/local/bin/conda \
     && rm -rf miniconda.sh \
