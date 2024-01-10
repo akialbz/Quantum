@@ -24,8 +24,8 @@ RUN set -ex \
 # JupyterLab app
 ENV NODE_OPTIONS="--max-old-space-size=4096" 
 RUN set -ex \
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt install -y --no-install-recommends nodejs 
+    && curl -fsSL https://deb.nodesource.com/setup_21.x | bash - \
+    && apt install -y nodejs
 
 RUN pip3 install --no-cache-dir jupyterlab jedi ipykernel
 
@@ -36,18 +36,15 @@ RUN set -ex \
        ipympl \
        jupyter_bokeh \
        kaleido \
+       plotly-geo \
        chart-studio \
        jupyter-dash \
        jupyter-resource-usage \
-       jupyterlab-drawio \
-    && jupyter labextension install \
-       @jupyter-widgets/jupyterlab-manager \
-       jupyter-matplotlib \
-       jupyterlab-plotly \
-       jupyterlab-chart-editor \
-    && jupyter lab build --name='Quantum'\
+       voila
+
+RUN set -ex \
+    && jupyter lab build --name='Quantum' \
     && jupyter lab clean \
-    && jlpm cache clean \
     && npm cache clean --force
 
 # R kernel

@@ -47,7 +47,7 @@ RUN set -ex \
        r-base-dev
 
 # install rpy2
-RUN pip3 install --no-cache-dir rpy2==3.4.5
+RUN pip3 install --no-cache-dir rpy2
 
 # install littler
 RUN R -e 'install.packages(c("littler","docopt"), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
@@ -65,8 +65,8 @@ RUN install2.r --error -- --clean devtools BiocManager
 
 # install R packages
 RUN set -ex \
-    && install2.r --error -- --clean RGCCA igraph dynamicTreeCut fastcluster pvclust \
-    && installBioc.r --error -- --clean WGCNA pkimes/sigclust2
+    && install2.r --error -- --clean RGCCA igraph dynamicTreeCut fastcluster \
+    && installBioc.r --error -- --clean WGCNA
 
 
 # clean apt

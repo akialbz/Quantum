@@ -15,11 +15,12 @@ RUN set -ex \
     && pip3 install --no-cache-dir \
        # statistical & ML
        fitter \
-       imbalanced-learn \
-       scikit-optimize \
        LIME \
        SHAP \
-       scikit-fuzzy \
+       imbalanced-learn \
+       scikit-optimize \
+       oapackage \
+       pingouin \
        pymoo \
        mrmr_selection \
        umap-learn \
@@ -28,8 +29,7 @@ RUN set -ex \
        # visualisation
        seaborn \
        yellowbrick \
-       bokeh \
-       pyvis
+       bokeh
 
 
 # install additional R packages
@@ -67,22 +67,6 @@ RUN set -ex \
     && conda run --no-capture-output -n lazypredict \
        python -m ipykernel install --user --name=LazyPredict \
     && conda clean --all --yes
-
-
-# update JupyterLab extensions & themes
-# -------------------------------------------------------------
-RUN set -ex \
-    && apt install -y --no-install-recommends git \
-    && pip3 install --no-cache-dir \
-       jupyterlab-git \
-       neptune-notebooks \
-       jupyterlab-material-night-eighties \
-       jupyterlab-horizon-theme \
-       theme-darcula \
-    && jupyter lab build --name='Quantum Starlight' \
-    && jupyter lab clean \
-    && jlpm cache clean \
-    && npm cache clean --force
 
 
 # clean apt

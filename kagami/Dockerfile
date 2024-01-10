@@ -27,6 +27,9 @@ RUN set -ex \
 
 # install Python packages
 RUN set -ex \
+    && pip3 install --no-cache-dir --upgrade pip setuptools wheel 
+
+RUN set -ex \
     && pip3 install --no-cache-dir \
        # base
        requests \
@@ -36,13 +39,13 @@ RUN set -ex \
        pytest \
        pooch \
        # numeric
-       numpy \
+       numpy==1.25.2 \
        scipy \
        pandas \
        tables \
        bottleneck \
        # homebrew
-       kagami>=3.1.0
+       kagami>=3.2.2
 
 
 # clean apt
