@@ -45,9 +45,13 @@ RUN install2.r --error -- --clean devtools BiocManager
 
 # install CRAN packages
 RUN apt-get install -y --no-install-recommends \
-    libglpk-dev
+    libglpk-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev
 
 RUN install2.r --error -- --clean \
+    # basic
+    rgl \
     # data manipulation
     reshape2 \
     matrixStats \
