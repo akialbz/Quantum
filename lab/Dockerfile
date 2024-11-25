@@ -34,14 +34,14 @@ RUN set -ex \
     && pip3 install --no-cache-dir \
        ipywidgets \
        ipympl \
-       jupyter_bokeh \
+       anywidget \
+       dash \
        kaleido \
        plotly-geo \
-       chart-studio \
-       jupyter-dash \
+       voila \
        jupyter-resource-usage \
-       voila
-
+       jupyterlab-spreadsheet-editor 
+       
 RUN set -ex \
     && jupyter lab build --name='Quantum' \
     && jupyter lab clean \
