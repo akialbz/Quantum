@@ -6,7 +6,7 @@
 #
 
 
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 
 # install dependencies
@@ -20,6 +20,7 @@ RUN set -ex \
        libffi-dev \
        python3-dev \
        build-essential \
+       gfortran \
        curl \
        wget \
        python3-pip
@@ -27,25 +28,29 @@ RUN set -ex \
 
 # install Python packages
 RUN set -ex \
-    && pip3 install --no-cache-dir --upgrade pip setuptools wheel 
-
-RUN set -ex \
+    && rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED \
     && pip3 install --no-cache-dir \
        # base
+       setuptools \
        requests \
        pysocks \
-       hypothesis \
-       typing-extensions \
-       pytest \
        pooch \
-       # numeric
-       numpy==1.25.2 \
-       scipy \
-       pandas \
-       tables \
        bottleneck \
+       meson \
+       Ninja \
+       typing-extensions \
+       # numeric
+       numpy==1.26.4 \
+       pandas==2.2.3 \
+       tables \
+       "pandas[performance]" \
+       "pandas[hdf5]" \
+       # test
+       pytest \
+       hypothesis \
+       "pandas[test]" \
        # homebrew
-       kagami>=3.2.2
+       kagami==3.2.3
 
 
 # clean apt
@@ -63,7 +68,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # python lib dir
 RUN mkdir -p /home/share/python/dist-packages/
-ENV PYTHONPATH /home/share/python/dist-packages/
+ENV PYTHONPATH=/home/share/python/dist-packages/
 
 # work dir(s)
 RUN mkdir -p /home/docker/

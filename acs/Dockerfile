@@ -14,6 +14,7 @@ FROM akialbz/quantum:kagami
 RUN set -ex \
     && pip3 install --no-cache-dir \
        # statistical & ML
+       scipy==1.13.1 \
        statsmodels \
        scikit-learn \
        # graph
@@ -43,11 +44,12 @@ RUN set -ex \
        libtiff5-dev \
        libjpeg-dev \
        libgit2-dev \
+       libtirpc-dev \
        r-base \
        r-base-dev
 
 # install rpy2
-RUN pip3 install --no-cache-dir rpy2
+RUN pip3 install --no-cache-dir rpy2==3.5.16
 
 # install littler
 RUN R -e 'install.packages(c("littler","docopt"), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'

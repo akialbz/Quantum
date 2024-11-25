@@ -12,6 +12,11 @@ FROM akialbz/quantum:lab
 # install additional Python packages
 # -------------------------------------------------------------
 RUN set -ex \
+    && apt update \
+    && apt install -y --no-install-recommends \
+    python3-graph-tool
+
+RUN set -ex \
     && pip3 install --no-cache-dir \
        # statistical & ML
        fitter \
@@ -22,37 +27,26 @@ RUN set -ex \
        oapackage \
        pingouin \
        pymoo \
-       mrmr_selection \
        umap-learn \
        mofapy2 \
        mofax \
+       gseapy \
        # visualisation
        seaborn \
-       yellowbrick \
-       bokeh
+       yellowbrick
 
 
 # install additional R packages
 # -------------------------------------------------------------
-RUN set -ex \
-    && apt update \
-    && apt install -y --no-install-recommends \
-       zlib1g-dev \
-       gfortran
+# RUN set -ex \
+#     && apt update \
+#     && apt install -y --no-install-recommends \
+#        zlib1g-dev
 
 RUN install2.r --error -- --clean \
     reshape \
     tidyverse \
     dplyr 
-
-RUN installBioc.r --error -- --clean \
-    cqn \
-    DESeq2 \
-    limma \
-    sva \
-    mixOmics
-
-RUN installGithub.r karlkumbier/iRF2.0
 
 
 # install additional kernels
