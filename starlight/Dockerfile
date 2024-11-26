@@ -14,6 +14,7 @@ FROM akialbz/quantum:lab
 RUN set -ex \
     && apt update \
     && apt install -y --no-install-recommends \
+    cmake \
     python3-graph-tool
 
 # quick fix for imcompatiblity with swig 4.3.0
