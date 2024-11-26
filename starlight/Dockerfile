@@ -17,17 +17,11 @@ RUN set -ex \
     cmake \
     python3-graph-tool
 
-# quick fix for imcompatiblity with swig 4.3.0
-# should check oapackage (currently 2.7.13) for future updates 
-RUN set -ex \
-    && apt install -y --no-install-recommends swig \
-    && pip3 install --no-cache-dir \
-    swig==4.2.1.post0 \
-    oapackage==2.7.6
-
 RUN set -ex \
     && pip3 install --no-cache-dir \
        # statistical & ML
+       swig>=4.3.0 \
+       oapackage>=2.7.14 \
        fitter \
        LIME \
        SHAP \
