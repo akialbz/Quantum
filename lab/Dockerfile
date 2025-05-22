@@ -40,16 +40,12 @@ RUN set -ex \
        plotly-geo \
        voila \
        jupyter-resource-usage \
-       jupyterlab-spreadsheet-editor 
+       jupyterlab-spreadsheet-editor
        
 RUN set -ex \
     && jupyter lab build --name='Quantum' \
     && jupyter lab clean \
     && npm cache clean --force
-
-# R kernel
-RUN set -ex \
-    && R -e 'install.packages("IRkernel", repos="https://cloud.r-project.org/"); IRkernel::installspec()'
 
 
 # clean apt
@@ -64,6 +60,6 @@ RUN set -ex \
 
 # set entry
 # -------------------------------------------------------------
-ENV PASSWORD=""
+ENV TOKEN=""
 EXPOSE 8888
-ENTRYPOINT ["sh", "-c", "jupyter lab --ip=0.0.0.0 --allow-root --no-browser --ServerApp.token=$PASSWORD"]
+ENTRYPOINT ["sh", "-c", "jupyter lab --ip=0.0.0.0 --allow-root --no-browser --ServerApp.token=$TOKEN"]

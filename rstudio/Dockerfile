@@ -21,6 +21,7 @@ RUN apt-get install -y --no-install-recommends \
     libbz2-dev \
     libz-dev \
     libicu-dev \
+    libdeflate-dev \
     default-jdk
 
 RUN set -ex \
@@ -38,9 +39,10 @@ RUN apt-get install -y --no-install-recommends \
     libfreetype6-dev \
     libpng-dev \
     libtiff5-dev \
-    libjpeg-dev
+    libjpeg-dev \
+    libcurl4-openssl-dev
 
-RUN install2.r --error -- --clean devtools BiocManager
+RUN install2.r --error -- --clean curl devtools BiocManager
 
 
 # install CRAN packages
@@ -93,6 +95,7 @@ RUN installBioc.r --error -- --clean \
     DESeq2 \
     GSEABase \
     limma \
+    edgeR \
     sva \
     # multiomics
     mixOmics \

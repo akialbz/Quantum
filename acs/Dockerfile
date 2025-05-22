@@ -6,13 +6,45 @@
 #
 
 
-FROM akialbz/quantum:kagami-arm64
+FROM ubuntu:noble
 
 
-# install additional Python packages
-# -------------------------------------------------------------
+# install dependencies
 RUN set -ex \
+    && apt update \
+    && apt install -y --no-install-recommends \
+       libblas-dev \
+       liblapack-dev \
+       libhdf5-dev \
+       libssl-dev \
+       libffi-dev \
+       python3-dev \
+       build-essential \
+       gfortran \
+       curl \
+       wget \
+       python3-pip
+
+
+# install Python packages
+RUN set -ex \
+    && rm -rf /usr/lib/python3.*/EXTERNALLY-MANAGED \
     && pip3 install --no-cache-dir \
+       # base
+       setuptools \
+       requests \
+       pysocks \
+       pooch \
+       bottleneck \
+       meson \
+       Ninja \
+       typing-extensions \
+       # numeric
+       numpy==1.26.4 \
+       pandas==2.2.3 \
+       tables \
+       "pandas[performance]" \
+       "pandas[hdf5]" \
        # statistical & ML
        scipy==1.13.1 \
        statsmodels \
@@ -22,60 +54,34 @@ RUN set -ex \
        networkx \
        # visualisation
        matplotlib \
-       plotly
+       plotly \
+       seaborn \
+       # test
+       pytest \
+       hypothesis \
+    #    "pandas[test]" \
        # homebrew
-      #  acs
-
-
-# install R and packages
-# -------------------------------------------------------------
-# install latest R
-RUN set -ex \
-    && apt update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends tzdata \
-    && apt install -y --no-install-recommends \
-       libcurl4-openssl-dev \
-       libxml2-dev \
-       libfontconfig1-dev \
-       libharfbuzz-dev \
-       libfribidi-dev \
-       libfreetype6-dev \
-       libpng-dev \
-       libtiff5-dev \
-       libjpeg-dev \
-       libgit2-dev \
-       libtirpc-dev \
-       r-base \
-       r-base-dev
-
-# install rpy2
-RUN pip3 install --no-cache-dir rpy2==3.5.16
-
-# install littler
-RUN R -e 'install.packages(c("littler","docopt"), repos = "http://cran.uk.r-project.org", ask = F, clean = T)'
-ENV PATH="/usr/local/lib/R/site-library/littler/bin:/usr/local/lib/R/site-library/littler/examples:${PATH}"
-
-# install R basis
-RUN apt install -y --no-install-recommends default-jre default-jdk
-
-RUN set -ex \
-    && R CMD javareconf \
-    && install2.r --error -- --clean rJava Rcpp
-
-# install R installers
-RUN install2.r --error -- --clean devtools BiocManager
-
-# install R packages
-RUN set -ex \
-    && install2.r --error -- --clean RGCCA igraph dynamicTreeCut fastcluster \
-    && installBioc.r --error -- --clean WGCNA
+       kagami==3.2.3
 
 
 # clean apt
-# -------------------------------------------------------------
 RUN set -ex \
     && apt --purge autoremove -y \
     && apt autoclean -y \
     && apt clean -y \
     && apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
+
+
+# set dirs
+# python lib dir
+RUN mkdir -p /home/share/python/dist-packages/
+ENV PYTHONPATH=/home/share/python/dist-packages/
+
+# work dir(s)
+RUN mkdir -p /home/docker/
+WORKDIR /home/docker/
+
+
+# set entry
+SHELL ["/bin/bash", "-c"]

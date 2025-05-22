@@ -6,7 +6,7 @@
 #
 
 
-FROM akialbz/quantum:lab-arm64
+FROM akialbz/quantum:mocha-arm64
 
 
 # install additional Python packages
@@ -19,21 +19,14 @@ RUN set -ex \
 RUN set -ex \
     && pip3 install --no-cache-dir \
        # statistical & ML
-       swig>=4.3.0 \
-       oapackage>=2.7.14 \
        fitter \
        LIME \
        SHAP \
        imbalanced-learn \
        scikit-optimize \
        pingouin \
-       pymoo \
        umap-learn \
-       mofapy2 \
-       mofax \
-       gseapy \
        # visualisation
-       seaborn \
        yellowbrick
 
 
@@ -47,9 +40,13 @@ RUN set -ex \
 RUN install2.r --error -- --clean \
     reshape \
     tidyverse \
-    dplyr 
+    dplyr \
+    fastcluster
 
+RUN set -ex \
+    && installBioc.r --error -- --clean WGCNA
 
+    
 # install additional kernels
 # -------------------------------------------------------------
 # lazypredict kernel
@@ -72,10 +69,3 @@ RUN set -ex \
     && apt clean -y \
     && apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/*
-
-
-# set entry
-# -------------------------------------------------------------
-ENV PASSWORD=""
-EXPOSE 8888
-ENTRYPOINT ["sh", "-c", "jupyter lab --ip=0.0.0.0 --allow-root --no-browser --ServerApp.token=$PASSWORD"]
